@@ -1,23 +1,23 @@
 /* BLOCKSTORM Service Worker
    Cache-First für alle eigenen Dateien, damit das Spiel offline startet.
    WICHTIG: bei jedem Update CACHE hochzählen, sonst bleibt die alte Version hängen. */
-const CACHE = "blockstorm-v4";
+const CACHE = "blockstorm-v4-flat";
 
 const FILES = [
   "./",
   "./index.html",
   "./style.css",
   "./manifest.json",
-  "./js/themes.js",
-  "./js/animations.js",
-  "./js/pieces.js",
-  "./js/modes.js",
-  "./js/input.js",
-  "./js/game.js",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "./icons/icon-maskable-512.png",
-  "./icons/apple-touch-icon.png"
+  "./themes.js",
+  "./animations.js",
+  "./pieces.js",
+  "./modes.js",
+  "./input.js",
+  "./game.js",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./icon-maskable-512.png",
+  "./apple-touch-icon.png"
 ];
 
 self.addEventListener("install", e => {
