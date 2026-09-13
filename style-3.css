@@ -1,0 +1,184 @@
+/* ===========================================================================
+   BLOCKSTORM — Oberfläche
+
+   Alle Farben kommen als CSS-Variablen aus themes.js und wechseln mit
+   Theme und Hell/Dunkel-Modus. Hier stehen nur Form, Abstand und Bewegung.
+   ========================================================================= */
+:root{
+  --bg:#121520;
+  --bg2:#1c2132;
+  --panel:#1c2030;
+  --ink:#eef1f8;
+  --dim:#8b93a8;
+  --acc:#6fb4d8;
+  --gold:#e0bb6a;
+  --on-acc:#0e2129;
+  --soft:rgba(255,255,255,.06);
+  --soft-hi:rgba(255,255,255,.12);
+  --line:rgba(255,255,255,.07);
+  --shadow:rgba(0,0,0,.35);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --f:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:var(--f);color:var(--ink);background:var(--bg);
+  overflow:hidden;overscroll-behavior:none;touch-action:manipulation;
+  user-select:none;-webkit-user-select:none;position:fixed;inset:0;
+  transition:background .35s ease,color .35s ease;
+}
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation;}
+
+/* ------------------------------------------------------------------ Layout */
+#app{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:calc(var(--safe-t) + 8px) 12px calc(var(--safe-b) + 8px);}
+
+#hud{flex:0 0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;}
+.side{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:var(--dim);}
+.side .crown{color:var(--gold);font-size:13px;}
+.side.right{justify-content:flex-end;}
+
+.icon-btn{width:42px;height:42px;border-radius:50%;background:var(--soft);
+  display:grid;place-items:center;transition:transform .22s var(--ease),background .22s;}
+.icon-btn:active{transform:scale(.9);background:var(--soft-hi);}
+.icon-btn svg{width:19px;height:19px;fill:none;stroke:var(--ink);stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round;}
+
+#scoreWrap{text-align:center;line-height:1;}
+#score{font-size:clamp(34px,10.5vw,52px);font-weight:700;letter-spacing:-1px;
+  font-variant-numeric:tabular-nums;transition:transform .24s var(--ease);}
+#score.bump{transform:scale(1.05);}
+#sub{margin-top:7px;font-size:11px;font-weight:600;letter-spacing:.6px;color:var(--dim);
+  display:flex;gap:9px;justify-content:center;align-items:center;}
+#sub b{color:var(--acc);}
+#modeTag{color:var(--gold);}
+
+#comboBar{flex:0 0 auto;height:22px;margin:8px 2px 0;display:flex;align-items:center;gap:9px;
+  opacity:0;transition:opacity .25s ease;}
+#comboBar.on{opacity:1;}
+#comboTxt{font-size:11.5px;font-weight:700;letter-spacing:.4px;color:var(--acc);white-space:nowrap;}
+#comboDots{font-size:13px;color:var(--gold);letter-spacing:2px;min-width:20px;}
+#comboTrack{flex:1;height:5px;border-radius:99px;background:var(--soft);overflow:hidden;}
+#comboFill{height:100%;width:0;border-radius:99px;background:var(--acc);
+  transition:width .45s var(--ease),background .5s;}
+
+#stage{flex:1 1 auto;position:relative;min-height:0;}
+#game{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block;}
+
+#dock{flex:0 0 auto;display:flex;justify-content:center;gap:10px;padding-top:6px;}
+.pw{min-width:96px;height:50px;padding:0 18px;border-radius:999px;background:var(--soft);
+  display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:700;
+  transition:transform .22s var(--ease),background .22s,box-shadow .22s,opacity .22s;}
+.pw:active{transform:scale(.95);}
+.pw .em{font-size:18px;line-height:1;}
+.pw .cnt{color:var(--gold);font-variant-numeric:tabular-nums;}
+.pw.active{background:var(--soft-hi);box-shadow:inset 0 0 0 1.6px var(--acc);}
+.pw.empty{opacity:.38;}
+
+/* ---------------------------------------------------------------- Overlays */
+.screen{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:15px;
+  padding:calc(var(--safe-t) + 22px) 24px calc(var(--safe-b) + 22px);
+  background:var(--bg);text-align:center;transition:opacity .3s ease;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;}
+.screen.hide{opacity:0;pointer-events:none;}
+
+.brand{line-height:.9;}
+.brand .l1{font-size:clamp(38px,12vw,58px);font-weight:700;letter-spacing:-1.6px;color:var(--ink);}
+.brand .l2{font-size:clamp(38px,12vw,58px);font-weight:700;letter-spacing:-1.6px;color:var(--acc);}
+.hello{font-size:13.5px;color:var(--dim);font-weight:500;max-width:300px;line-height:1.5;}
+.kicker{font-size:12.5px;font-weight:700;letter-spacing:1.4px;color:var(--dim);}
+.bestline{font-size:12.5px;font-weight:600;letter-spacing:.6px;color:var(--dim);}
+.bestline b{color:var(--gold);font-size:17px;letter-spacing:0;margin-left:8px;font-weight:700;
+  font-variant-numeric:tabular-nums;}
+
+.btn{width:min(300px,80vw);padding:17px;border-radius:999px;font-size:16px;font-weight:700;
+  letter-spacing:.2px;background:var(--acc);color:var(--on-acc);
+  box-shadow:0 6px 18px var(--shadow);
+  transition:transform .22s var(--ease),filter .22s,box-shadow .22s;}
+.btn:active{transform:scale(.965);filter:brightness(.94);box-shadow:0 2px 8px var(--shadow);}
+.btn.ghost{background:var(--soft);color:var(--ink);box-shadow:none;}
+.btn.ghost:active{box-shadow:none;}
+.btn.sm{width:auto;padding:13px 26px;font-size:14px;}
+
+.iconrow{display:flex;gap:14px;}
+.iconrow .icon-btn{width:52px;height:52px;}
+
+/* ------------------------------------------------------------ Modus-Auswahl */
+.modes{display:flex;gap:10px;width:min(340px,88vw);}
+.mode{flex:1;padding:15px 8px;border-radius:22px;background:var(--soft);
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  transition:transform .22s var(--ease),background .22s,box-shadow .22s;}
+.mode:active{transform:scale(.95);}
+.mode.on{background:var(--soft-hi);box-shadow:inset 0 0 0 1.8px var(--acc);}
+.mode .ic{font-size:21px;line-height:1;color:var(--dim);transition:color .22s;}
+.mode.on .ic{color:var(--acc);}
+.mode .nm{font-size:12.5px;font-weight:700;letter-spacing:.2px;}
+.mode.on .nm{color:var(--acc);}
+#mDesc{font-size:13px;color:var(--dim);line-height:1.5;max-width:min(330px,86vw);min-height:36px;}
+
+/* ------------------------------------------------------- Segment-Umschalter */
+.seg-group{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--soft);
+  width:min(330px,86vw);}
+.seg{flex:1;padding:11px 6px;border-radius:999px;font-size:13px;font-weight:600;color:var(--dim);
+  transition:background .22s,color .22s,transform .2s var(--ease);}
+.seg:active{transform:scale(.96);}
+.seg.on{background:var(--acc);color:var(--on-acc);font-weight:700;}
+.submini{font-size:11.5px;color:var(--dim);margin-top:-8px;}
+
+/* -------------------------------------------------------------------- Karten */
+.card{width:min(330px,86vw);background:var(--panel);border-radius:26px;padding:4px 18px;
+  box-shadow:0 4px 16px var(--shadow);}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--line);}
+.row:last-child{border-bottom:0;}
+.row .name{font-size:14.5px;font-weight:600;text-align:left;}
+.row .val{font-size:15px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;}
+.sw{width:48px;height:28px;border-radius:99px;background:var(--soft-hi);
+  position:relative;transition:background .22s;flex:0 0 auto;}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .22s var(--ease);}
+.sw.on{background:var(--acc);}
+.sw.on::after{transform:translateX(20px);}
+
+/* --------------------------------------------------------------- Theme-Liste */
+#themeList{width:min(330px,86vw);display:flex;flex-direction:column;gap:8px;}
+.theme{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 14px;border-radius:20px;background:var(--soft);
+  transition:transform .2s var(--ease),background .2s,box-shadow .2s;}
+.theme:active{transform:scale(.975);}
+.theme.on{background:var(--soft-hi);box-shadow:inset 0 0 0 1.8px var(--acc);}
+.tinfo{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+.theme .tn{font-size:14.5px;font-weight:600;}
+.theme.on .tn{color:var(--acc);}
+.theme .th{font-size:11px;color:var(--dim);font-weight:500;}
+.swatches{display:flex;gap:3px;padding:6px;border-radius:12px;}
+.swatches i{width:12px;height:12px;border-radius:4px;display:block;}
+
+.bigscore{font-size:clamp(44px,14vw,62px);font-weight:700;letter-spacing:-1.4px;color:var(--gold);
+  font-variant-numeric:tabular-nums;line-height:1;}
+.newbest{font-size:12.5px;font-weight:700;letter-spacing:1.2px;color:var(--acc);}
+.metaline{font-size:13px;color:var(--dim);font-weight:500;line-height:1.5;max-width:300px;}
+
+.doc{width:min(340px,88vw);max-height:58vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  text-align:left;font-size:13.5px;line-height:1.75;color:var(--dim);}
+.doc h4{color:var(--ink);font-size:13.5px;letter-spacing:.2px;margin:18px 0 6px;font-weight:700;}
+.doc h4:first-child{margin-top:0;}
+.doc b{color:var(--ink);}
+.doc .sp{color:var(--gold);font-weight:700;}
+
+#toast{position:absolute;left:50%;bottom:calc(var(--safe-b) + 80px);transform:translate(-50%,10px);
+  z-index:30;background:var(--panel);color:var(--ink);padding:11px 18px;border-radius:99px;
+  font-size:12.5px;font-weight:600;opacity:0;box-shadow:0 4px 18px var(--shadow);
+  transition:opacity .28s,transform .28s var(--ease);
+  pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;}
+#toast.on{opacity:1;transform:translate(-50%,0);}
+.mini{font-size:11px;color:var(--dim);letter-spacing:.4px;}
+
+/* Im Hellmodus brauchen weiße Flächen etwas mehr Kontur */
+body.light .card,body.light #toast{border:1px solid var(--line);}
+body.light .sw::after{box-shadow:0 1px 3px rgba(40,50,70,.3);}

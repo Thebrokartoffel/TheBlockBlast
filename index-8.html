@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#121520">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BlockStorm">
+<meta name="description" content="BLOCKSTORM — Block-Puzzle mit Normal, Extreme und Chaos. Chain-Combos, Pre-Clear-Glow und fünf Farbpaletten.">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="stylesheet" href="./style.css">
+<title>BLOCKSTORM</title>
+</head>
+<body>
+
+<div id="app">
+  <div id="hud">
+    <div class="side"><span class="crown">♛</span><span id="best">0</span></div>
+    <div id="scoreWrap">
+      <div id="score">0</div>
+      <div id="sub"><span>Level <b id="lvl">1</b></span><span id="modeTag">Normal</span></div>
+    </div>
+    <div class="side right">
+      <button class="icon-btn" id="btnPause" aria-label="Pause">
+        <svg viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="comboBar">
+    <div id="comboTxt">COMBO ×2</div>
+    <div id="comboDots">••</div>
+    <div id="comboTrack"><div id="comboFill"></div></div>
+  </div>
+
+  <div id="stage"><canvas id="game"></canvas></div>
+
+  <div id="dock">
+    <button class="pw" id="pwHammer"><span class="em">🔨</span><span class="cnt" id="cHammer">2</span></button>
+    <button class="pw" id="pwSwap"><span class="em">🔄</span><span class="cnt" id="cSwap">2</span></button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ============================ Start ============================ -->
+<div class="screen" id="scStart">
+  <div class="brand"><div class="l1">BLOCK</div><div class="l2">STORM</div></div>
+  <div class="hello">Zieh die Teile aufs Feld und räum Reihen ab.</div>
+
+  <div class="modes">
+    <button class="mode on" data-mode="normal"><span class="ic">◻</span><span class="nm">Normal</span></button>
+    <button class="mode" data-mode="extreme"><span class="ic">◈</span><span class="nm">Extreme</span></button>
+    <button class="mode" data-mode="chaos"><span class="ic">✳</span><span class="nm">Chaos</span></button>
+  </div>
+  <div id="mDesc">Klassisch. 8×8, faire Teile, entspannt.</div>
+  <div class="bestline">Bestwert <b id="sBest">0</b></div>
+
+  <button class="btn" id="btnPlay">Spielen</button>
+  <button class="btn ghost" id="btnResume" style="display:none">Fortsetzen</button>
+
+  <div class="iconrow">
+    <button class="icon-btn" id="btnRules" aria-label="Regeln">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.7 9.6a2.4 2.4 0 1 1 3.3 2.2c-.7.3-1 .9-1 1.5M12 16.4h.01"/></svg>
+    </button>
+    <button class="icon-btn" id="btnStats" aria-label="Statistik">
+      <svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>
+    </button>
+    <button class="icon-btn" id="btnSettings" aria-label="Einstellungen">
+      <svg viewBox="0 0 24 24"><path d="M4 7.5h8M17 7.5h3M4 16.5h3M12 16.5h8"/><circle cx="14.5" cy="7.5" r="2.4"/><circle cx="9.5" cy="16.5" r="2.4"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ============================ Game Over ============================ -->
+<div class="screen hide" id="scOver">
+  <div class="kicker">Runde vorbei · <span id="oMode">Normal</span></div>
+  <div class="bigscore" id="oScore">0</div>
+  <div class="newbest" id="oNewBest" style="display:none">Neuer Rekord</div>
+  <div class="metaline" id="oWord">Kein Teil passte mehr. Neue Runde?</div>
+  <div class="metaline" id="oMeta"></div>
+  <button class="btn" id="btnAgain">Noch eine Runde</button>
+  <button class="btn ghost" id="btnHome">Menü</button>
+</div>
+
+<!-- ============================ Pause ============================ -->
+<div class="screen hide" id="scPause">
+  <div class="kicker">Pause</div>
+  <div class="bigscore" id="pScore">0</div>
+  <button class="btn" id="btnContinue">Weiter</button>
+  <button class="btn ghost" id="btnPSettings">Einstellungen</button>
+  <button class="btn ghost sm" id="btnQuit">Runde aufgeben</button>
+</div>
+
+<!-- ============================ Statistik ============================ -->
+<div class="screen hide" id="scStats">
+  <div class="kicker">Statistik</div>
+  <div class="card">
+    <div class="row"><span class="name">Best Normal</span><span class="val" id="tBestN">0</span></div>
+    <div class="row"><span class="name">Best Extreme</span><span class="val" id="tBestE">0</span></div>
+    <div class="row"><span class="name">Best Chaos</span><span class="val" id="tBestC">0</span></div>
+    <div class="row"><span class="name">Beste Combo</span><span class="val" id="tCombo">×0</span></div>
+    <div class="row"><span class="name">Beste Kette</span><span class="val" id="tChain">×0</span></div>
+    <div class="row"><span class="name">Perfect Clears</span><span class="val" id="tPerfect">0</span></div>
+    <div class="row"><span class="name">Größtes Feld</span><span class="val" id="tRings">0</span></div>
+    <div class="row"><span class="name">Linien gesamt</span><span class="val" id="tLines">0</span></div>
+    <div class="row"><span class="name">Runden</span><span class="val" id="tGames">0</span></div>
+  </div>
+  <button class="btn" id="btnStatsBack">Zurück</button>
+</div>
+
+<!-- ============================ Optionen ============================ -->
+<div class="screen hide" id="scOpt">
+  <div class="kicker">Einstellungen</div>
+  <div class="card">
+    <div class="row"><span class="name">Sound</span><div class="sw" id="swSound"></div></div>
+    <div class="row"><span class="name">Vibration</span><div class="sw" id="swHaptic"></div></div>
+    <div class="row"><span class="name">Effekte</span><div class="sw" id="swFx"></div></div>
+    <div class="row"><span class="name">Platzier-Hilfe</span><div class="sw" id="swSnap"></div></div>
+    <div class="row"><span class="name">Fast volle Linien zeigen</span><div class="sw" id="swHint"></div></div>
+  </div>
+  <div class="kicker">Darstellung</div>
+  <div id="modeSwitch" class="seg-group">
+    <button class="seg" data-val="light">Hell</button>
+    <button class="seg" data-val="dark">Dunkel</button>
+    <button class="seg" data-val="auto">Automatisch</button>
+  </div>
+  <div id="modeHint" class="submini">Dunkle Oberfläche</div>
+
+  <div class="kicker">Farbwelt</div>
+  <div id="themeList"></div>
+  <button class="btn" id="btnOptBack">Zurück</button>
+  <button class="btn ghost sm" id="btnWipe">Alles zurücksetzen</button>
+  <div class="mini">BLOCKSTORM v4</div>
+</div>
+
+<!-- ============================ Regeln ============================ -->
+<div class="screen hide" id="scRules">
+  <div class="kicker">Regeln</div>
+  <div class="doc">
+    <h4>Grundregel</h4>
+    Teile aus der Ablage aufs Feld ziehen. Volle Reihen und Spalten lösen sich auf. Teile lassen sich nicht drehen. Passt kein Teil mehr, ist die Runde vorbei.
+
+    <h4>Ziehen</h4>
+    Das Teil schwebt über dem Finger. Je weiter oben du ziehst, desto weiter hebt es sich ab — so bleibt die Zielzelle immer sichtbar. Sitzt der Finger knapp daneben, rutscht das Teil auf die nächste gültige Position.
+
+    <h4>Pre-Clear-Glow</h4>
+    Schwebt das Teil über einer Position, die eine Reihe oder Spalte vollmacht, leuchtet diese Linie sofort hell auf — noch bevor du loslässt.
+
+    <h4>Punkte</h4>
+    2 pro gesetztem Block. 1 Linie 100, 2 Linien 300, 3 Linien 600, 4 Linien 1000, je weitere +300. Dazu 5 pro aufgelöster Zelle.
+
+    <h4>Combo</h4>
+    Jeder Zug, der auflöst, erhöht die Combo. Multiplikator <b>1 + 0,3 pro Stufe</b> bis ×6. Die Combo überlebt zwei Züge ohne Auflösen — erst der dritte setzt sie zurück. Die Punkte im Balken zeigen, wie viel Luft noch bleibt.
+
+    <h4>Kette</h4>
+    Sprengt ein Spezialblock weitere Spezialblöcke frei, zündet die nächste Welle mit ×1,5, ×2, ×2,5 …
+
+    <h4>Spezialblöcke</h4>
+    <span class="sp">◆ Gem</span> +300 Bonus<br>
+    <span class="sp">✦ Star</span> +200 und räumt die komplette Kreuzlinie<br>
+    <span class="sp">● Bombe</span> +150 und sprengt 3×3<br>
+    <span class="sp">×2 Boost</span> verdoppelt die ganze Welle, mehrere stapeln
+
+    <h4>Perfect Clear</h4>
+    Feld komplett leer: großer Bonus, die Combo läuft weiter statt abzureißen, der nächste Teilesatz passt besonders gut und es gibt einen Hammer dazu. In Extreme löst sich zusätzlich ein Ring auf.
+
+    <h4>Modus Normal</h4>
+    Das klassische 8×8-Feld.
+
+    <h4>Modus Extreme</h4>
+    Drei Linien auf einmal oder eine Serie von fünf lösen <b>Overdrive</b> aus: die Kamera zoomt heraus und ein Ring legt sich um das Feld — 8×8 wird 12×12, dann 16×16, maximal 20×20. Fällt eine Linie, die komplett im äußersten Ring liegt, löst sich dieser Ring dauerhaft auf und die Kamera fährt zurück. Das mittlere 8×8 bleibt immer bestehen.
+
+    <h4>Modus Chaos</h4>
+    Alle paar Züge ein Zufallsereignis: Bombenlieferung, Wildcard (passt überall, auch über Blöcke), Board-Shuffle, Rainbow-Row (zehn Sekunden doppelte Punkte), Frost-Zelle (drei Züge gesperrt), Mystery-Block (verwandelt sich beim Setzen) oder Double Trouble (vier Teile). Dafür gibt es dauerhaft ×1,5 Punkte.
+
+    <h4>Power-ups</h4>
+    🔨 entfernt einen Block, 🔄 tauscht die restlichen Teile. Nachschub alle 18.000 bzw. 13.000 Punkte.
+  </div>
+  <button class="btn" id="btnRulesBack">Verstanden</button>
+</div>
+
+<script src="./js/themes.js"></script>
+<script src="./js/animations.js"></script>
+<script src="./js/pieces.js"></script>
+<script src="./js/modes.js"></script>
+<script src="./js/input.js"></script>
+<script src="./js/game.js"></script>
+<script>BS.Game.boot();</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "BLOCKSTORM",
+  "short_name": "BlockStorm",
+  "description": "Block-Puzzle mit Normal, Extreme und Chaos. Chain-Combos, Pre-Clear-Glow und fünf Farbpaletten.",
+  "start_url": "./",
+  "scope": "./",
+  "id": "blockstorm",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "portrait",
+  "background_color": "#121520",
+  "theme_color": "#121520",
+  "lang": "de",
+  "dir": "ltr",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
